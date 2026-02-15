@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snake & Ladder</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#fdf6aa;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100dvh;
+}
+
+#startScreen{
+  background:#21c9f3;
+  padding:30px;
+  border-radius:12px;
+  text-align:center;
+  color:white;
+  width:70%;
+  max-width:350px;
+  box-shadow:0 6px 15px rgba(0,0,0,0.2);
+}
+
+#startScreen input,
+#startScreen select{
+  width:90%;
+  padding:10px;
+  margin:10px 0;
+  border:none;
+  border-radius:6px;
+  font-size:16px;
+}
+
+#startScreen button{
+  width:50%;
+  padding:10px;
+  font-size:16px;
+  border:none;
+  border-radius:6px;
+  background:white;
+  color:#000000;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+#startScreen button:active{
+  transform:scale(0.97);
+}
+</style>
+</head>
+
+<body>
+
+<div id="startScreen">
+  <h1>🎲 เกมงูบันได</h1>
+
+  <input id="nameInput" placeholder="ใส่ชื่อของคุณ">
+
+  <select id="roomSelect">
+    <option value="room1">Room 1</option>
+    <option value="room2">Room 2</option>
+    <option value="room3">Room 3</option>
+    <option value="room4">Room 4</option>
+  </select>
+
+  <button onclick="startGame()">เริ่มเกม</button>
+</div>
+
+<script>
+function startGame(){
+
+  const name = document.getElementById("nameInput").value.trim();
+  const room = document.getElementById("roomSelect").value;
+
+  if(name === ""){
+    alert("กรุณาใส่ชื่อ");
+    return;
+  }
+
+  localStorage.setItem("playerName", name);
+  localStorage.setItem("roomName", room);
+
+  window.location.href = "game.html";
+}
+</script>
+
+</body>
+</html>
