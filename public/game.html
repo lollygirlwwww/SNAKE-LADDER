@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snake & Ladder</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#fdf6aa;
+}
+
+#leaderboard{
+  position:fixed;
+  top:15px;
+  right:15px;
+  background:white;
+  padding:12px;
+  border-radius:10px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.2);
+  font-size:14px;
+  min-width:160px;
+  max-height:60vh;     /* 🔥 จำกัดความสูง */
+  overflow-y:auto;     /* 🔥 เลื่อนภายในได้ */
+}
+
+
+#leaderboard h3{
+  margin:0 0 8px 0;
+  font-size:16px;
+}
+
+#leaderboard div{
+  margin-bottom:4px;
+}
+
+
+#gameScreen{
+  height:100vh;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  padding:10px;
+  box-sizing:border-box;
+}
+
+#boardWrapper{
+  position:relative;
+  width:min(90vw, calc(100dvh - 180px));
+  height:min(90vw, calc(100dvh - 180px));
+  max-width:600px;
+  max-height:600px;
+}
+
+
+
+
+
+
+
+
+#board{
+  width:100%;
+  height:100%;
+  display:grid;
+  grid-template-columns:repeat(10,1fr);
+  grid-template-rows:repeat(10,1fr);
+}
+
+#overlay{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+}
+
+.cell{
+  border:2px solid black;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-weight:bold;
+  font-size:2vmin;
+  position:relative;
+}
+
+.player{
+  width:60%;
+  height:60%;
+  border-radius:50%;
+  position:absolute;
+  bottom:5%;
+}
+
+
+
+
+/* กล่องคำถาม */
+#questionText{
+  max-width:600px;
+  font-size:20px;
+  margin-bottom:20px;
+}
+
+/* ตัวเลือก */
+#choices{
+  width:100%;
+  max-width:500px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+#choices button{
+  padding:12px;
+  font-size:16px;
+  border:none;
+  border-radius:8px;
+  background:#2196f3;
+  color:white;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+#choices button:hover{
+  background:#1976d2;
+}
+
+#choices button:active{
+  transform:scale(0.97);
+}
+#questionButtonWrapper{
+  margin:15px 0;
+  display:flex;
+  justify-content:center;
+  width:100%;
+}
+
+#questionBtn{
+  width:90%;
+  max-width:400px;
+  padding:14px;
+  font-size:18px;
+  border:none;
+  border-radius:12px;
+  background:#ff9800;
+  color:white;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+#questionBtn:hover{
+  background:#f57c00;
+}
+
+#questionBtn:active{
+  transform:scale(0.96);
+}
+
+#questionScreen{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.4);  /* มืดเฉพาะกระดาน */
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:50;
+}
+
+
+/* กล่องตรงกลาง */
+#questionBox{
+  width:80%;
+  max-width:400px;
+  background:white;
+  padding:20px;
+  border-radius:14px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.3);
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  text-align:center;
+  animation:popup 0.25s ease;
+}
+
+
+@keyframes popup{
+  from{
+    transform:scale(0.8);
+    opacity:0;
+  }
+  to{
+    transform:scale(1);
+    opacity:1;
+  }
+}
+
+
+@media (max-width:768px){
+
+  #leaderboard{
+    position:relative;   /* เอา fixed ออก */
+    top:auto;
+    right:auto;
+    width:100%;
+    margin:10px 0;
+    box-sizing:border-box;
+    z-index:auto;
+    overflow:auto;
+    max-height:20vh;
+  }
+
+  
+
+}
+
+
+
+
+</style>
+</head>
+
+<body>
+
+<div id="gameScreen">
+  <h2>เกมงูบันได</h2>
+  <div id="leaderboard" ></div>
+<div id="questionButtonWrapper">
+  <button id="questionBtn" onclick="getQuestion()">QUESTION HERE</button>
+</div>
+
+  <div id="boardWrapper">
+    <div id="board"></div>
+    <div id="overlay"></div>
+    <img src="images/boo.PNG" id="overlay">
+    <div id="questionScreen">
+      <div id="questionBox">
+        <div id="questionText"></div>
+        <div id="choices"></div>
+      </div>
+    </div>
+</div>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+
+
+
+const socket = io();
+let iFinished = false;
+let isAnimating = false;
+let questionOpen = false;
+
+const board = document.getElementById("board");
+const overlay = document.getElementById("overlay");
+const lb = document.getElementById("leaderboard");
+
+const name = localStorage.getItem("playerName");
+const room = localStorage.getItem("roomName");
+if(!name){ window.location.href="index.html"; }
+socket.emit("newPlayer", { name, room });
+
+/* ===== สร้างกระดาน ===== */
+for (let row = 9; row >= 0; row--) {
+  for (let col = 0; col < 10; col++) {
+
+    const cell = document.createElement("div");
+    cell.className = "cell";
+
+    let number;
+    if (row % 2 === 0) {
+      number = row * 10 + col + 1;
+    } else {
+      number = row * 10 + (9 - col) + 1;
+    }
+
+    cell.id = "cell-" + (number);
+    cell.innerText = number;
+    cell.style.backgroundColor = (row+col)%2===0 ? "#e3f2fd" : "#90caf9";
+
+    board.appendChild(cell);
+  }
+}
+
+/* ===== ตำแหน่งช่อง ===== */
+function getCellPosition(number){
+  const row = Math.floor((number - 1) / 10);
+  let col = (number - 1) % 10;
+
+  if(row % 2 === 1){
+    col = 9 - col;
+  }
+
+  const cellSize = board.offsetWidth / 10;
+
+  return {
+    x: col * cellSize,
+    y: (9 - row) * cellSize
+  };
+}
+
+/* ===== ปุ่มคำถาม ===== */
+function getQuestion(){
+
+  if(iFinished || questionOpen) return;   // 🔥 ใส่ตรงนี้
+  questionOpen = true
+
+  socket.emit("getQuestion");
+}
+
+
+/* ===== แสดงคำถาม ===== */
+socket.on("showQuestion",(data)=>{
+
+  document.getElementById("questionText").innerText = data.question;
+
+  const choicesDiv = document.getElementById("choices");
+  choicesDiv.innerHTML = "";
+
+  data.choices.forEach(choice=>{
+
+    const btn = document.createElement("button");
+    btn.innerText = choice;
+    btn.style.margin = "5px";
+
+    btn.onclick = ()=>{
+
+      if(iFinished) return;
+
+      document.querySelectorAll("#choices button")
+        .forEach(b=> b.disabled = true);
+
+      socket.emit("answer", choice);
+    };
+
+    choicesDiv.appendChild(btn);
+  });
+
+  document.getElementById("questionScreen").style.display="flex";
+});
+
+
+
+/* ===== ผู้เล่น ===== */
+socket.on("updatePlayers",(players)=>{
+
+  const myId = socket.id;
+
+  if(!isAnimating){
+    document.querySelectorAll(".player").forEach(p=>p.remove());
+  }
+
+  const lb = document.getElementById("leaderboard");
+  lb.innerHTML = "";
+
+  // 🔥 เรียงตามแต้ม (ตำแหน่งมาก → อันดับสูง)
+  const sortedPlayers = Object.entries(players)
+    .sort((a,b)=> b[1].position - a[1].position);
+
+  const me = players[myId];
+
+  /* =========================
+     YOU แสดงด้านบน พร้อมอันดับ
+  ========================== */
+  if(me){
+  const myRank = sortedPlayers.findIndex(([id])=> id===myId) + 1;
+
+  lb.innerHTML += `
+    <div style="
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:12px;
+      padding:10px;
+      border-radius:12px;
+      background:#e3f2fd;
+      border:2px solid ${me.color};
+    ">
+
+      <span style="
+        width:16px;
+        height:16px;
+        background:${me.color};
+        border-radius:50%;
+        display:inline-block;
+      "></span>
+
+      <span style="
+        color:${me.color};
+        font-weight:bold;
+      ">
+        🏆 #${myRank} | 👤 YOU - ${me.name}
+      </span>
+
+      (${me.position})
+
+    </div>
+  `;
+}
+
+  /* =========================
+     แสดงทุกคน (รวมอันดับ)
+  ========================== */
+  sortedPlayers.forEach(([id,player],index)=>{
+
+    const rank = index +1;
+    const color = player.color || "black";
+    const isMe = id === myId;
+
+    lb.innerHTML += `
+      <div style="
+        display:flex;
+        align-items:center;
+        gap:6px;
+        margin-bottom:6px;
+        padding:6px;
+        border-radius:8px;
+        background:${isMe ? "#fff3cd" : "#f9f9f9"};
+        font-weight:${isMe ? "bold" : "normal"};
+      ">
+        #${rank} -
+<span style="color:${player.color}; font-weight:bold;">
+  ${player.name}
+</span>
+(${player.position})
+
+      </div>
+    `;
+
+    // 🔥 ถ้ากำลัง animate ตัวเอง → ไม่วาดทับ
+    if(id === myId && isAnimating) return;
+
+    const cell = document.getElementById("cell-"+player.position);
+    if(!cell) return;
+
+    const piece = document.createElement("div");
+    piece.className="player";
+    piece.id="player-"+id;
+    piece.style.background=color;
+
+    cell.appendChild(piece);
+  });
+
+});
+
+
+
+/* ===== Animation ===== */
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+async function animateMove(playerId, from, to){
+  const step=from<to?1:-1;
+  let current=from;
+
+  const piece=document.getElementById("player-"+playerId);
+  if(!piece) return;
+
+  while(current!==to){
+    current+=step;
+    const cell=document.getElementById("cell-"+current);
+    if(cell){ cell.appendChild(piece); }
+    await sleep(300);
+  }
+};
+
+socket.on("answerResult", async (data)=>{
+
+  isAnimating = true;
+
+  const box = document.getElementById("questionBox");
+
+  box.innerHTML = `
+    <div style="font-size:20px; font-weight:bold;">
+      ${data.correct ? "ตอบถูก! 🎉 ได้เดิน" : "ตอบผิด 😢 ถอยหลัง"}
+    </div>
+    <div style="margin-top:10px; font-size:18px;">
+      สุ่มลูกเต๋าได้
+    </div>
+    <div style="font-size:40px; margin:10px 0;">
+      🎲 ${data.dice}
+    </div>
+  `;
+
+  await sleep(1500);
+
+  document.getElementById("questionScreen").style.display="none";
+
+
+  box.innerHTML = `
+    <div id="questionText"></div>
+    <div id="choices"></div>
+  `;
+
+  // 🔥 สร้างหมากถ้ายังไม่มี
+  let piece=document.getElementById("player-"+data.playerId);
+
+  if(!piece){
+    piece=document.createElement("div");
+    piece.className="player";
+    piece.id="player-"+data.playerId;
+    piece.style.background="black";
+
+    const startCell=document.getElementById("cell-"+data.start);
+    if(startCell){ startCell.appendChild(piece); }
+  }
+
+  await animateMove(data.playerId,data.start,data.afterDice);
+
+  const finalCell=document.getElementById("cell-"+data.finalPosition);
+  if(piece && finalCell){
+    finalCell.appendChild(piece);
+  }
+
+  isAnimating = false;
+  questionOpen = false;
+
+});
+
+
+
+</script>
+</body>
+</html>
