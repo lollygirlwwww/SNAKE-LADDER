@@ -331,6 +331,7 @@ function getQuestion(){
 
 /* ===== แสดงคำถาม ===== */
 socket.on("showQuestion",(data)=>{
+  if(data.playerId !== socket.id) return;
 
   document.getElementById("questionText").innerText = data.question;
 
@@ -485,6 +486,7 @@ async function animateMove(playerId, from, to){
 };
 
 socket.on("answerResult", async (data)=>{
+  if(data.playerId !== socket.id) return;
 
   isAnimating = true;
 
