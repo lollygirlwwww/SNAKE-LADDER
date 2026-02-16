@@ -366,10 +366,6 @@ socket.on("updatePlayers",(players)=>{
 
   const myId = socket.id;
 
-  if(!isAnimating){
-    document.querySelectorAll(".player").forEach(p=>p.remove());
-  }
-
   const lb = document.getElementById("leaderboard");
   lb.innerHTML = "";
 
@@ -453,13 +449,16 @@ socket.on("updatePlayers",(players)=>{
     const cell = document.getElementById("cell-"+player.position);
     if(!cell) return;
 
-    const piece = document.createElement("div");
-    piece.className="player";
-    piece.id="player-"+id;
-    piece.style.background=color;
+    let piece = document.getElementById("player-"+id);
+
+    if(!piece){
+    piece = document.createElement("div");
+    piece.className = "player";
+    piece.id = "player-"+id;
+    piece.style.background = color;
+}
 
     cell.appendChild(piece);
-  });
 
 });
 
