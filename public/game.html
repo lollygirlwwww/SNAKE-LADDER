@@ -494,7 +494,7 @@ socket.on("answerResult", async (data)=>{
 
   isAnimating = true;
 
-  const isMe = data.playerId === socket.id;
+  const isMe = data.playerId === myId;
 
   // 🔥 แสดง popup เฉพาะคนที่ตอบ
   if(isMe){
@@ -549,6 +549,11 @@ socket.on("answerResult", async (data)=>{
     questionOpen = false;
     document.getElementById("questionBtn").disabled = false;
   }
+  let myId = null;
+
+socket.on("connect", ()=>{
+  myId = socket.id;
+});
 
 });
 
