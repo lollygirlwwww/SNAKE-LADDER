@@ -267,6 +267,11 @@ body{
 
 
 const socket = io();
+let myId = null;
+
+socket.on("connect", ()=>{
+  myId = socket.id;
+});
 let iFinished = false;
 let isAnimating = false;
 let questionOpen = false;
@@ -370,8 +375,6 @@ socket.on("updatePlayers",(players)=>{
   if(isAnimating) return;
   // 🔥 ลบหมากทั้งหมดก่อนวาดใหม่
   document.querySelectorAll(".player").forEach(p=>p.remove());
-
-  const myId = socket.id;
 
   const lb = document.getElementById("leaderboard");
   lb.innerHTML = "";
