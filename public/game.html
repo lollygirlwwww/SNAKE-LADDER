@@ -494,38 +494,42 @@ socket.on("answerResult", async (data)=>{
 
   isAnimating = true;
 
-  const box = document.getElementById("questionBox");
+  const isMe = data.playerId === socket.id;
 
-  box.innerHTML = `
-    <div style="font-size:20px; font-weight:bold;">
-      ${data.correct ? "ตอบถูก! 🎉 ได้เดิน" : "ตอบผิด 😢 ถอยหลัง"}
-    </div>
-    <div style="margin-top:10px; font-size:18px;">
-      สุ่มลูกเต๋าได้
-    </div>
-    <div style="font-size:40px; margin:10px 0;">
-      🎲 ${data.dice}
-    </div>
-  `;
+  // 🔥 แสดง popup เฉพาะคนที่ตอบ
+  if(isMe){
 
-  await sleep(1500);
+    const box = document.getElementById("questionBox");
 
-  document.getElementById("questionScreen").style.display="none";
+    box.innerHTML = `
+      <div style="font-size:20px; font-weight:bold;">
+        ${data.correct ? "ตอบถูก! 🎉 ได้เดิน" : "ตอบผิด 😢 ถอยหลัง"}
+      </div>
+      <div style="margin-top:10px; font-size:18px;">
+        สุ่มลูกเต๋าได้
+      </div>
+      <div style="font-size:40px; margin:10px 0;">
+        🎲 ${data.dice}
+      </div>
+    `;
 
+    await sleep(1500);
 
-  box.innerHTML = `
-    <div id="questionText"></div>
-    <div id="choices"></div>
-  `;
+    document.getElementById("questionScreen").style.display="none";
 
-  // 🔥 สร้างหมากถ้ายังไม่มี
+    box.innerHTML = `
+      <div id="questionText"></div>
+      <div id="choices"></div>
+    `;
+  }
+
+  // 🔥 animate ทุกคนเห็นเหมือนกัน
   let piece=document.getElementById("player-"+data.playerId);
 
   if(!piece){
     piece=document.createElement("div");
     piece.className="player";
     piece.id="player-"+data.playerId;
-    piece.style.background="black";
 
     const startCell=document.getElementById("cell-"+data.start);
     if(startCell){ startCell.appendChild(piece); }
@@ -539,11 +543,14 @@ socket.on("answerResult", async (data)=>{
   }
 
   isAnimating = false;
-  questionOpen = false;
-  document.getElementById("questionBtn").disabled = false;
+
+  // 🔥 รีเซ็ตปุ่มเฉพาะคนที่ตอบ
+  if(isMe){
+    questionOpen = false;
+    document.getElementById("questionBtn").disabled = false;
+  }
 
 });
-
 
 
 </script>
