@@ -548,12 +548,17 @@ socket.on("answerResult", async (data)=>{
   questionOpen = false;
 
 });
+  // 🔥 บอก server ว่าออกจากห้องก่อนปิดหน้า
+window.addEventListener("beforeunload", ()=>{
+  socket.emit("leaveRoom");
+});
 
 
 
 </script>
 </body>
 </html>
+
 
 
 
