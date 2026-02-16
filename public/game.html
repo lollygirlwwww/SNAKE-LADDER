@@ -427,47 +427,40 @@ socket.on("updatePlayers",(players)=>{
   ========================== */
   sortedPlayers.forEach(([id,player],index)=>{
 
-    const rank = index +1;
-    const color = player.color || "black";
-    const isMe = id === myId;
+  const rank = index +1;
+  const color = player.color || "black";
+  const isMe = id === myId;
 
-    lb.innerHTML += `
-      <div style="
-        display:flex;
-        align-items:center;
-        gap:6px;
-        margin-bottom:6px;
-        padding:6px;
-        border-radius:8px;
-        background:${isMe ? "#fff3cd" : "#f9f9f9"};
-        font-weight:${isMe ? "bold" : "normal"};
-      ">
-        #${rank} -
-<span style="color:${player.color}; font-weight:bold;">
-  ${player.name}
-</span>
-(${player.position})
+  lb.innerHTML += `
+    <div style="
+      display:flex;
+      align-items:center;
+      gap:6px;
+      margin-bottom:6px;
+      padding:6px;
+      border-radius:8px;
+      background:${isMe ? "#fff3cd" : "#f9f9f9"};
+      font-weight:${isMe ? "bold" : "normal"};
+    ">
+      #${rank} -
+      <span style="color:${player.color}; font-weight:bold;">
+        ${player.name}
+      </span>
+      (${player.position})
+    </div>
+  `;
 
-      </div>
-    `;
+  let piece = document.getElementById("player-"+id);
 
-    // 🔥 ถ้ากำลัง animate ตัวเอง → ไม่วาดทับ
-    if(id === myId && isAnimating) return;
-
-    const cell = document.getElementById("cell-"+player.position);
-    if(!cell) return;
-
-    let piece = document.getElementById("player-"+id);
-
-    if(!piece){
+  if(!piece){
     piece = document.createElement("div");
     piece.className="player";
     piece.id="player-"+id;
     piece.style.background=color;
-}
+  }
 
-    const cell = document.getElementById("cell-"+player.position);
-    if(cell && piece.parentElement !== cell){
+  const cell = document.getElementById("cell-"+player.position);
+  if(cell && piece.parentElement !== cell){
     cell.appendChild(piece);
   }
   });
@@ -552,5 +545,6 @@ socket.on("answerResult", async (data)=>{
 </script>
 </body>
 </html>
+
 
 
