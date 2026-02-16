@@ -153,14 +153,11 @@ io.on("connection",(socket)=>{
     }
 
 
-    socket.emit("answerResult",{
-      playerId: socket.id,
-      correct: selectedChoice === correctAnswer,
-      dice: dice,
-      start: start,
-      afterDice: afterDice,
-      finalPosition: finalPosition
-    });
+      io.to(room).emit("answerResult",{
+        playerId: socket.id,
+        start: start,
+        afterDice: afterDice,
+        finalPosition: finalPosition});
 
     io.to(room).emit("updatePlayers", roomData.players);
 
@@ -193,4 +190,5 @@ io.on("connection",(socket)=>{
 server.listen(3000, "0.0.0.0", ()=>{
   console.log("Server running on port 3000");
 });
+
 
