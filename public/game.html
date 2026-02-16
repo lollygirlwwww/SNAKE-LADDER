@@ -514,6 +514,8 @@ socket.on("answerResult", async (data)=>{
     <div id="choices"></div>
   `;
 
+  if(id === myId && isAnimating) return;
+
   // 🔥 สร้างหมากถ้ายังไม่มี
   let piece=document.getElementById("player-"+data.playerId);
 
@@ -544,6 +546,7 @@ socket.on("answerResult", async (data)=>{
 </script>
 </body>
 </html>
+
 
 
 
