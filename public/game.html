@@ -322,15 +322,19 @@ function getCellPosition(number){
 /* ===== ปุ่มคำถาม ===== */
 function getQuestion(){
 
-  if(iFinished || questionOpen) return;   // 🔥 ใส่ตรงนี้
-  questionOpen = true
+  if(iFinished || questionOpen || isAnimating) return;
+
+  questionOpen = true;
+  document.getElementById("questionBtn").disabled = true;
 
   socket.emit("getQuestion");
-}
+  }
 
 
 /* ===== แสดงคำถาม ===== */
 socket.on("showQuestion",(data)=>{
+
+  if(questionOpen === false) return; // 🔥 กัน event ซ้อน
 
   document.getElementById("questionText").innerText = data.question;
 
@@ -536,6 +540,7 @@ socket.on("answerResult", async (data)=>{
 
   isAnimating = false;
   questionOpen = false;
+  document.getElementById("questionBtn").disabled = false;
 
 });
 
