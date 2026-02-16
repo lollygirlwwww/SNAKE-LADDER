@@ -363,6 +363,7 @@ socket.on("showQuestion",(data)=>{
 
 /* ===== ผู้เล่น ===== */
 socket.on("updatePlayers",(players)=>{
+  if(isAnimating) return;
 
   const myId = socket.id;
 
