@@ -58,6 +58,23 @@ function getRandomQuestion(){
 const WIN_POSITION = 100;
 
 io.on("connection",(socket)=>{
+  socket.on("leaveRoom", ()=>{
+
+  const room = socket.roomName;
+  if(!room) return;
+
+  if(rooms[room] && rooms[room].players[socket.id]){
+
+    delete rooms[room].players[socket.id];
+
+    if(Object.keys(rooms[room].players).length === 0){
+      delete rooms[room];
+    } else {
+      io.to(room).emit("updatePlayers", rooms[room].players);
+    }
+  }
+
+});
 
   socket.on("newPlayer",(data)=>{
     const { name, room } = data;
@@ -172,5 +189,6 @@ io.on("connection",(socket)=>{
 server.listen(3000, "0.0.0.0", ()=>{
   console.log("Server running on port 3000");
 });
+
 
 
