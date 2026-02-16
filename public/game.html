@@ -372,105 +372,45 @@ socket.on("showQuestion",(data)=>{
 
 /* ===== ผู้เล่น ===== */
 socket.on("updatePlayers",(players)=>{
-  if(isAnimating) return;
-  // 🔥 ลบหมากทั้งหมดก่อนวาดใหม่
-  document.querySelectorAll(".player").forEach(p=>p.remove());
 
   const lb = document.getElementById("leaderboard");
   lb.innerHTML = "";
 
-  // 🔥 เรียงตามแต้ม (ตำแหน่งมาก → อันดับสูง)
   const sortedPlayers = Object.entries(players)
     .sort((a,b)=> b[1].position - a[1].position);
 
-  const me = players[myId];
-
-  /* =========================
-     YOU แสดงด้านบน พร้อมอันดับ
-  ========================== */
-  if(me){
-  const myRank = sortedPlayers.findIndex(([id])=> id===myId) + 1;
-
-  lb.innerHTML += `
-    <div style="
-      display:flex;
-      align-items:center;
-      gap:8px;
-      margin-bottom:12px;
-      padding:10px;
-      border-radius:12px;
-      background:#e3f2fd;
-      border:2px solid ${me.color};
-    ">
-
-      <span style="
-        width:16px;
-        height:16px;
-        background:${me.color};
-        border-radius:50%;
-        display:inline-block;
-      "></span>
-
-      <span style="
-        color:${me.color};
-        font-weight:bold;
-      ">
-        🏆 #${myRank} | 👤 YOU - ${me.name}
-      </span>
-
-      (${me.position})
-
-    </div>
-  `;
-}
-
-  /* =========================
-     แสดงทุกคน (รวมอันดับ)
-  ========================== */
   sortedPlayers.forEach(([id,player],index)=>{
 
     const rank = index +1;
-    const color = player.color || "black";
     const isMe = id === myId;
 
     lb.innerHTML += `
-      <div style="
-        display:flex;
-        align-items:center;
-        gap:6px;
-        margin-bottom:6px;
-        padding:6px;
-        border-radius:8px;
-        background:${isMe ? "#fff3cd" : "#f9f9f9"};
-        font-weight:${isMe ? "bold" : "normal"};
-      ">
+      <div style="margin-bottom:6px;">
         #${rank} -
-<span style="color:${player.color}; font-weight:bold;">
-  ${player.name}
-</span>
-(${player.position})
-
+        <span style="color:${player.color}; font-weight:bold;">
+          ${player.name}
+        </span>
+        (${player.position})
       </div>
     `;
-
-    // 🔥 ถ้ากำลัง animate ตัวเอง → ไม่วาดทับ
-    if(id === myId && isAnimating) return;
-
-    const cell = document.getElementById("cell-"+player.position);
-    if(!cell) return;
 
     let piece = document.getElementById("player-"+id);
 
     if(!piece){
-    piece = document.createElement("div");
-    piece.className = "player";
-    piece.id = "player-"+id;
-    piece.style.background = color;
-}
+      piece = document.createElement("div");
+      piece.className="player";
+      piece.id="player-"+id;
+      piece.style.background = player.color;
+    }
 
-    cell.appendChild(piece);
+    // ❗ ห้ามวาร์ปตัวที่กำลัง animate
+    if(id === myId && isAnimating) return;
 
-});
+    const cell = document.getElementById("cell-"+player.position);
+    if(cell) cell.appendChild(piece);
+
+  });
+
 });
 
 
@@ -494,6 +434,7 @@ async function animateMove(playerId, from, to){
 };
 
 socket.on("answerResult", async (data)=>{
+  isAnimating = true;
 
   const isMe = data.playerId === myId;
 
@@ -537,6 +478,7 @@ socket.on("answerResult", async (data)=>{
   }
 
   await animateMove(data.playerId,data.start,data.afterDice);
+  isAnimating = false;
 
   const finalCell=document.getElementById("cell-"+data.finalPosition);
   if(piece && finalCell){
