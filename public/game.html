@@ -449,6 +449,8 @@ socket.on("updatePlayers",(players)=>{
     </div>
   `;
 
+  if(id === myId && isAnimating) return;
+
   let piece = document.getElementById("player-"+id);
 
   if(!piece){
@@ -546,6 +548,7 @@ socket.on("answerResult", async (data)=>{
 </script>
 </body>
 </html>
+
 
 
 
