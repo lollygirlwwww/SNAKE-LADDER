@@ -80,10 +80,10 @@ io.on("connection",(socket)=>{
   });
 
   socket.on("getQuestion",()=>{
-    const q = getRandomQuestion();
-    socket.currentQuestion = q;
-    socket.emit("showQuestion", q);
-  });
+     const q = getRandomQuestion();
+     socket.currentQuestion = q;   // เก็บคำถามแยกแต่ละคน
+     socket.emit("showQuestion", q);  // ส่งเฉพาะคนนั้น
+});
 
   socket.on("answer",(selectedChoice)=>{
 
@@ -172,3 +172,4 @@ io.on("connection",(socket)=>{
 server.listen(3000, "0.0.0.0", ()=>{
   console.log("Server running on port 3000");
 });
+
