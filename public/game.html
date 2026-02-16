@@ -370,6 +370,13 @@ const snakes = {
 
 /* ===== ผู้เล่น ===== */
 socket.on("updatePlayers",(players)=>{
+  // 🔥 ลบหมากของคนที่ออกไปแล้ว
+document.querySelectorAll(".player").forEach(piece=>{
+  const id = piece.id.replace("player-","");
+  if(!players[id]){
+    piece.remove();
+  }
+});
 
   const myId = socket.id;
 
@@ -547,6 +554,7 @@ socket.on("answerResult", async (data)=>{
 </script>
 </body>
 </html>
+
 
 
 
