@@ -273,6 +273,7 @@ socket.on("connect", ()=>{
   myId = socket.id;
 });
 let iFinished = false;
+let animatingPlayerId = null;
 let isAnimating = false;
 let questionOpen = false;
 
@@ -382,7 +383,6 @@ socket.on("updatePlayers",(players)=>{
   sortedPlayers.forEach(([id,player],index)=>{
 
     const rank = index +1;
-    const isMe = id === myId;
 
     lb.innerHTML += `
       <div style="margin-bottom:6px;">
@@ -403,8 +403,8 @@ socket.on("updatePlayers",(players)=>{
       piece.style.background = player.color;
     }
 
-    // ❗ ห้ามวาร์ปตัวที่กำลัง animate
-    if(id === myId && isAnimating) return;
+    // 🔥 ถ้าตัวนี้กำลัง animate ห้ามวาร์ป
+    if(id === animatingPlayerId) return;
 
     const cell = document.getElementById("cell-"+player.position);
     if(cell) cell.appendChild(piece);
@@ -412,7 +412,6 @@ socket.on("updatePlayers",(players)=>{
   });
 
 });
-
 
 
 /* ===== Animation ===== */
