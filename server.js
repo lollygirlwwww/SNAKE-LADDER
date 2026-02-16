@@ -153,7 +153,7 @@ io.on("connection",(socket)=>{
     }
 
 
-    io.to(room).emit("answerResult",{
+    socket.emit("answerResult",{
       playerId: socket.id,
       correct: selectedChoice === correctAnswer,
       dice: dice,
@@ -193,3 +193,4 @@ io.on("connection",(socket)=>{
 server.listen(3000, "0.0.0.0", ()=>{
   console.log("Server running on port 3000");
 });
+
