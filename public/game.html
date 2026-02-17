@@ -502,16 +502,22 @@ socket.on("answerResult", async (data)=>{
   const box = document.getElementById("questionBox");
 
   box.innerHTML = `
-    <div style="font-size:20px; font-weight:bold;">
-      ${data.correct ? "ตอบถูก! 🎉 ได้เดิน" : "ตอบผิด 😢 ถอยหลัง"}
-    </div>
-    <div style="margin-top:10px; font-size:18px;">
-      สุ่มลูกเต๋าได้
-    </div>
-    <div style="font-size:40px; margin:10px 0;">
-      🎲 ${data.dice}
-    </div>
-  `;
+  <div style="font-size:20px; font-weight:bold;">
+    ${data.correct ? "ตอบถูก! 🎉 ได้เดิน" : "ตอบผิด 😢 ถอยหลัง"}
+  </div>
+
+  <div style="margin-top:10px; font-size:16px;">
+    เฉลย: <b style="color:green;">${data.correctAnswer}</b>
+  </div>
+
+  <div style="margin-top:10px; font-size:18px;">
+    สุ่มลูกเต๋าได้
+  </div>
+
+  <div style="font-size:40px; margin:10px 0;">
+    🎲 ${data.dice}
+  </div>
+`;
 
   await sleep(1500);
 
@@ -558,6 +564,7 @@ window.addEventListener("beforeunload", ()=>{
 </script>
 </body>
 </html>
+
 
 
 
