@@ -456,6 +456,7 @@ io.on("connection",(socket)=>{
     socket.emit("answerResult",{
       playerId: socket.id,
       correct: isCorrect,
+      correctAnswer: correctAnswer,
       dice: dice,
       start: start,
       afterDice: afterDice,
@@ -487,6 +488,7 @@ io.on("connection",(socket)=>{
 server.listen(3000, "0.0.0.0", ()=>{
   console.log("Server running on port 3000");
 });
+
 
 
 
