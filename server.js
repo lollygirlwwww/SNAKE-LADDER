@@ -46,7 +46,7 @@ const snakes = {
 };
 
 // ===== ชุดที่ 1 =====
-const question = [
+const questions = [
 
 { question: "เหตุใดจึงเรียกว่า “หุ่นกระบอก”", choices: ["ทำจากกระดาษ","ใช้กระบอกไม้ไผ่เป็นแกนตัวหุ่น","มีเสียงคล้ายกระบอก","ใช้กล่องไม้เป็นฐาน"], answer: "ใช้กระบอกไม้ไผ่เป็นแกนตัวหุ่น" },
 
@@ -295,6 +295,7 @@ io.on("connection",(socket)=>{
 server.listen(3000, "0.0.0.0", ()=>{
   console.log("Server running on port 3000");
 });
+
 
 
 
