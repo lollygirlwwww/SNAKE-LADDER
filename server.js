@@ -153,7 +153,7 @@ const questions = [
 { question: "เหตุผลที่ควรรักษาหุ่นกระบอกในสมุทรสงครามคืออะไร", choices: ["เป็นมรดกทางวัฒนธรรม","เป็นของเล่นสมัยใหม่","เป็นสินค้าอุตสาหกรรม","เป็นกีฬา"], answer: "เป็นมรดกทางวัฒนธรรม" }
 
 ]; 
-];
+
 
 
 function getRandomQuestion(){
@@ -292,9 +292,12 @@ io.on("connection",(socket)=>{
 
 });
 
-server.listen(3000, "0.0.0.0", ()=>{
-  console.log("Server running on port 3000");
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, ()=>{
+  console.log("Server running on port " + PORT);
 });
+
 
 
 
